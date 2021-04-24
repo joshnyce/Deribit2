@@ -20,7 +20,6 @@ namespace Deribit
             (outter: "result", inner: "trades") };
 
         public delegate void Writer(MarketEvent Data);
-        public static Writer[] writers = new[] { (Writer)new TextFile().ProcessMessage }; //this is ugly
 
 
         private static void Main()
@@ -28,6 +27,9 @@ namespace Deribit
             Log.Logger = new LoggerConfiguration()
                .WriteTo.Console()
                .CreateLogger();
+            Writer writers = new Logger().ProcessMessage;
+            writers += new TextFile().ProcessMessage; //multicast delegate supports multiple writers
+            //could create instances of IWriters dynamically using Activator.CreateInstance(), so the list of processors could be configured externally
             try
             {
                 var service = new DeribitService(currencies, paths, writers);                

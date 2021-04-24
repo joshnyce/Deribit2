@@ -11,7 +11,7 @@ namespace Deribit.Types
 
         public MarketEvent(JToken msg)
         {
-            //would normally use bespoke classes to parse JSON, but this is kind of cute
+            //would normally use bespoke classes to parse JSON, but this is faster for prototyping
             var props = GetType().GetProperties();
             props.ForEach(x => x.SetValue(this, (string)msg[x.Name]));
             symbol = (string)msg["instrument_name"];

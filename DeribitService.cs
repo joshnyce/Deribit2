@@ -15,29 +15,32 @@ using WebSocketSharp;
 
 namespace Deribit
 {
+    /* todo:
+        listen to more events and log all activity (like subscriptions starting and stopping)
+        listen to heartbeat and add timer to try reconnecting until successful
+        use separate socket connections for each subscription
+        inlcude quotes (in addition to trades) and any other types of events that are of interest
+        inlcude symbols other than futures, and generally explore API to figure out how to get more data
+        way to request replays from the API in case of outages (looks like sequence number can be used to specify ranges of historical data)
+        way to add and remove subscriptions dynamically, if that's desirable
+        use a windows service or need keep-alive system
+        add more logging destinations
+    */
+
     public class DeribitService : IDeribitService, IDisposable
     {
-        //todo:
-        //use a windows service or need keep-alive system
-        //listen to more events and log all activity (like subscriptions starting and stopping)
-        //listen to heartbeat and add timer to try reconnecting until successful
-        //use separate socket connections for each subscription
-        //process quotes (in addition to trades) and any other types of events that are of interest
-        //public method to ubsubscribe
-        //way to request replays from the API in case of outages (looks like sequence number can be used to specify ranges of historical data)
-
         //these inputs should be configurable
         private const string urlGetInstruments = "https://test.deribit.com/api/v2/public/get_instruments";
         private const string urlSocket = "wss://test.deribit.com/ws/api/v2";
 
         private readonly string[] currencies;
         private readonly (string outter, string inner)[] paths; //should allow for variable depth (number of tokens)
-        private readonly Program.Writer[] writers;
+        private readonly Program.Writer writers;
 
         private ConcurrentDictionary<string, SerialQueue> eventLoops = new();
         private WebSocket ws;
 
-        internal DeribitService(string[] currencies, (string outter, string inner)[] paths, Program.Writer[] writers)
+        internal DeribitService(string[] currencies, (string outter, string inner)[] paths, Program.Writer writers)
         {
             this.currencies = currencies;
             this.paths = paths;
@@ -55,17 +58,25 @@ namespace Deribit
 
             foreach (var ccy in currencies)
             {
-                ws.Send(JsonConvert.SerializeObject(new {
-                    jsonrpc = "2.0",
-                    id = 0,
-                    method = "public/get_last_trades_by_instrument", //have to change this for quotes
-                    @params = new { instrument_name = $"{ccy}-PERPETUAL" } }));
-                ws.Send(JsonConvert.SerializeObject(new {
-                    jsonrpc = "2.0",
-                    id = 1,
-                    method = "public/subscribe",
-                    @params = new { channels = GetInstruments(Ccy: ccy, Expired: false, Kind: "future") } }));
+                //i'm not sure these are correct yet - need to spend more time exploring the API
+                ws.Send(GenerateMessage(
+                    0, 
+                    "public/get_last_trades_by_instrument", //have to change this for quotes
+                    new { instrument_name = $"{ccy}-PERPETUAL" } )); //this may filter out a lot of data - need better understanding of the API
+                ws.Send(GenerateMessage(
+                    1,
+                    "public/subscribe",
+                    new { channels = GetInstruments(ccy, false, "future") } )); //hard-coded to (or filtered on) futures for now
             }
+        }
+
+        private string GenerateMessage(int ID, string Method, dynamic Parameters)
+        {
+            return JsonConvert.SerializeObject(new {
+                jsonrpc = "2.0",
+                id = ID,
+                method = Method,
+                @params = Parameters });
         }
 
         public string[] GetInstruments(string Ccy, bool Expired, string Kind)
@@ -74,7 +85,7 @@ namespace Deribit
                 ["currency"] = Ccy,
                 ["expired"] = Expired.ToString().ToLower(),
                 ["kind"] = Kind };
-            var client = new RestClient(urlGetInstruments);
+            var client = new RestClient(urlGetInstruments); //should use websocket for this too
             var request = new RestRequest(Method.GET);
             request.AddHeader("Content-Type", "application/json");
             parameters.ForEach(x => request.AddParameter(x.Key, x.Value));
@@ -100,7 +111,7 @@ namespace Deribit
         {
             if (!eventLoops.ContainsKey(Data.Key()))
                 eventLoops[Data.Key()] = new SerialQueue();
-            eventLoops[Data.Key()].DispatchAsync(() => { writers.ForEach(x => x(Data)); });
+            eventLoops[Data.Key()].DispatchAsync(() => { writers(Data); });
         }
 
         public void Dispose()
