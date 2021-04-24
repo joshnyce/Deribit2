@@ -1,1 +1,1 @@
-# deribit2
+far from production-ready or even complete, but this version includes some ideas for flexibility and architecture
