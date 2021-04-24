@@ -40,7 +40,8 @@ namespace Deribit
         { 
             ws = new WebSocket(urlSocket);
             ws.SslConfiguration.EnabledSslProtocols = SslProtocols.Tls12;
-            ws.OnMessage += (sender, e) => { if (e.IsText) HandleMessage(e.Data); };
+            //add separate sockets/callbacks for other MarketEvent types, or determine message type from the ID (but some messages don't include IDs)
+            ws.OnMessage += (sender, e) => { if (e.IsText) HandleMessage<Trade>(e.Data); }; 
             ws.OnError += (sender, e) => { Log.Error(e.Message); };
             ws.Connect();
 
@@ -83,16 +84,15 @@ namespace Deribit
                 .ToArray();
         }
 
-        public void HandleMessage(string Data)
+        public void HandleMessage<T>(string Data) where T : MarketEvent
         {
-            //if this remains generic, need to determine message type (from the ID or using separate callbacks and/or socket connections)
             var obj = JObject.Parse(Data);
             paths.ForEach(p => obj
                 .SelectToken(p.outter)
                 ?.SelectToken(p.inner)
                 ?.OrderBy(x => (string)x["timestamp"])
                 .ThenBy(x => (string)x["trade_seq"])
-                .ForEach(x => ProcessMarketEvent(new Trade(x))) );
+                .ForEach(x => ProcessMarketEvent((MarketEvent)Activator.CreateInstance(typeof(T), new [] { x }))));
         }
 
         public void ProcessMarketEvent(MarketEvent Data)

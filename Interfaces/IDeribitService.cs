@@ -8,7 +8,7 @@ namespace Deribit.Interfaces
     public interface IDeribitService
     {
         string[] GetInstruments(string Ccy, bool Expired, string Kind);
-        public void HandleMessage(string Data);
+        public void HandleMessage<T>(string Data) where T : MarketEvent;
         public void ProcessMarketEvent(MarketEvent Data);
     }
 }

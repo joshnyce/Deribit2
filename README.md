@@ -3,11 +3,11 @@ this version is still relatively simple, incomplete, and far from production-rea
 
 todo:
 
+use separate socket connections for each subscription, distribute load, add redundancy
+
 listen to more events and log all activity (like subscriptions starting and stopping)
 
 listen to heartbeat and add timer to try reconnecting until successful
-
-use separate socket connections for each subscription
 
 inlcude quotes (in addition to trades) and any other types of events that are of interest
 
