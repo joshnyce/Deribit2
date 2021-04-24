@@ -1,4 +1,5 @@
 ﻿using Deribit.Types;
+using Newtonsoft.Json.Linq;
 
 namespace Deribit.Interfaces
 {
@@ -9,6 +10,6 @@ namespace Deribit.Interfaces
     {
         string[] GetInstruments(string Ccy, bool Expired, string Kind);
         public void HandleMessage<T>(string Data) where T : MarketEvent;
-        public void ProcessMarketEvent(MarketEvent Data);
+        public void ProcessMarketEvent<T>(JToken Token) where T : MarketEvent;
     }
 }

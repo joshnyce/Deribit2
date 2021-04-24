@@ -86,20 +86,24 @@ namespace Deribit
 
         public void HandleMessage<T>(string Data) where T : MarketEvent
         {
+            //don't need to loop through (JSON) paths
+            //after adding more security types and associated paths, should determine correct path as function of T
+            //but initial messages are also different than streaming messages, so would need to determine message type another way
             var obj = JObject.Parse(Data);
             paths.ForEach(p => obj
                 .SelectToken(p.outter)
                 ?.SelectToken(p.inner)
                 ?.OrderBy(x => (string)x["timestamp"])
                 .ThenBy(x => (string)x["trade_seq"])
-                .ForEach(x => ProcessMarketEvent((MarketEvent)Activator.CreateInstance(typeof(T), new [] { x }))));
+                .ForEach(x => ProcessMarketEvent<T>(x)));
         }
 
-        public void ProcessMarketEvent(MarketEvent Data)
+        public void ProcessMarketEvent<T>(JToken Token) where T : MarketEvent//MarketEvent Data)
         {
-            if (!eventLoops.ContainsKey(Data.Key()))
-                eventLoops[Data.Key()] = new SerialQueue();
-            eventLoops[Data.Key()].DispatchAsync(() => { writers(Data); });
+            var data = (MarketEvent)Activator.CreateInstance(typeof(T), new[] { Token });
+            if (!eventLoops.ContainsKey(data.Key()))
+                eventLoops[data.Key()] = new SerialQueue();
+            eventLoops[data.Key()].DispatchAsync(() => { writers(data); });
         }
 
         public void Dispose()
