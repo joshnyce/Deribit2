@@ -20,7 +20,7 @@ namespace Deribit
             (outter: "result", inner: "trades") };
 
         public delegate void Writer(MarketEvent Data);
-        public static Writer[] writers = new[] { (Writer)new TextFile().ProcessMessage };
+        public static Writer[] writers = new[] { (Writer)new TextFile().ProcessMessage }; //this is ugly
 
 
         private static void Main()
