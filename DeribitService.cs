@@ -88,7 +88,7 @@ namespace Deribit
         {
             //don't need to loop through (JSON) paths
             //after adding more security types and associated paths, should determine correct path as function of T
-            //but initial messages are also different than streaming messages, so would need to determine message type another way
+            //but initial messages are also different from streaming messages, so would need to determine message type another way
             var obj = JObject.Parse(Data);
             paths.ForEach(p => obj
                 .SelectToken(p.outter)
