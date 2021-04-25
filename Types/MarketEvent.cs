@@ -1,40 +1,28 @@
-﻿using MoreLinq.Extensions;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json;
 using System;
-using System.Collections.Concurrent;
 using System.Linq;
-using System.Reflection;
 
 namespace Deribit.Types
 {
     public abstract class MarketEvent
     {
-        private readonly string symbol;
-        private readonly Type type;
-
-        private readonly static ConcurrentDictionary<Type, PropertyInfo[]> props = new();
-
-        public MarketEvent(JToken msg)
-        {
-            //would normally use bespoke classes to parse JSON, but this is fine for prototyping and it's easy to change later
-            type = GetType();
-            if (!props.ContainsKey(type))
-                props[type] = type.GetProperties();
-            props[type].ForEach(x => x.SetValue(this, (string)msg[x.Name]));
-            symbol = (string)msg["instrument_name"];
-        }
+        //may need to get instrument name (for the Key method) another way if any messages don't contain this field
+        //also can't control the order for the output (this property is last) for text files, but text file output is usually not important
+        [JsonProperty("instrument_name")]
+        public string instrument_name { get; private set; }
 
         public string Key()
         {
-            return $"{type.Name}_{symbol}";
+            return $"{this.GetType().Name}_{instrument_name}";
         }
 
         public string TextSerialize(bool includeHeader)
         {
+            var props = GetType().GetProperties();
             var s = includeHeader
-                ? string.Join(",", props[type].Select(x => x.Name)) + Environment.NewLine
+                ? string.Join(",", props.Select(x => x.Name)) + Environment.NewLine
                 : "";
-            return $"{s}{string.Join(",", props[type].Select(x => x.GetValue(this)))}";
+            return $"{s}{string.Join(",", props.Select(x => x.GetValue(this)))}";
         }
     }
 }

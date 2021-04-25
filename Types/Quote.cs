@@ -1,19 +1,12 @@
 ﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace Deribit.Types
 {
 
-    //properties are JSON-serializable for other destinations (which are not implemented yet)
     //using strings because data is serialized, but that might change when adding other destinations
 
     public class Quote : MarketEvent
     {
-        public Quote(JToken data) : base(data) { }
-
-        [JsonProperty("instrument_name")]
-        public string instrument_name { get; private set; }
-
         [JsonProperty("best_bid_price")]
         public string best_bid_price { get; private set; }
 

@@ -1,16 +1,12 @@
 ﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace Deribit.Types
 {
 
-    //properties are JSON-serializable for other destinations (which are not implemented yet)
     //using strings because data is serialized, but that might change when adding other destinations
 
     public class Trade : MarketEvent
     {
-        public Trade(JToken data) : base(data) { }
-
         [JsonProperty("trade_seq")]
         public string trade_seq { get; private set; }
 
@@ -28,9 +24,6 @@ namespace Deribit.Types
 
         [JsonProperty("price")]
         public string price { get; private set; }
-
-        [JsonProperty("instrument_name")]
-        public string instrument_name { get; private set; }
 
         [JsonProperty("index_price")]
         public string index_price { get; private set; }

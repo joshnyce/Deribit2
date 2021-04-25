@@ -73,7 +73,7 @@ namespace Deribit
                 ["currency"] = Ccy,
                 ["expired"] = Expired.ToString().ToLower(),
                 ["kind"] = Kind };
-            var client = new RestClient(urlGetInstruments); //should use websocket for this too
+            var client = new RestClient(urlGetInstruments); //could use websocket for this too
             var request = new RestRequest(Method.GET);
             request.AddHeader("Content-Type", "application/json");
             parameters.ForEach(x => request.AddParameter(x.Key, x.Value));
@@ -97,9 +97,9 @@ namespace Deribit
                 .ForEach(x => ProcessMarketEvent<T>(x)));
         }
 
-        public void ProcessMarketEvent<T>(JToken Token) where T : MarketEvent//MarketEvent Data)
+        public void ProcessMarketEvent<T>(JToken Token) where T : MarketEvent
         {
-            var data = (MarketEvent)Activator.CreateInstance(typeof(T), new[] { Token });
+            var data = Token.ToObject<T>();
             if (!eventLoops.ContainsKey(data.Key()))
                 eventLoops[data.Key()] = new SerialQueue();
             eventLoops[data.Key()].DispatchAsync(() => { writers(data); });
