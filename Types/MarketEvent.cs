@@ -13,7 +13,7 @@ namespace Deribit.Types
 
         public string Key()
         {
-            return $"{this.GetType().Name}_{instrument_name}";
+            return $"{GetType().Name}_{instrument_name}";
         }
 
         public string TextSerialize(bool includeHeader)
