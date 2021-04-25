@@ -25,19 +25,15 @@ namespace Deribit
         private readonly (string outter, string inner)[] paths; //should allow for variable depth (number of tokens)
         private readonly Program.Writer writers;
 
-        private ConcurrentDictionary<string, SerialQueue> eventLoops = new();
-        private WebSocket ws;
+        private readonly ConcurrentDictionary<string, SerialQueue> eventLoops = new();
+        private readonly WebSocket ws;
 
         internal DeribitService(string[] currencies, (string outter, string inner)[] paths, Program.Writer writers)
         {
             this.currencies = currencies;
             this.paths = paths;
             this.writers = writers;
-            Init();
-        }
-         
-        private void Init()
-        { 
+
             ws = new WebSocket(urlSocket);
             ws.SslConfiguration.EnabledSslProtocols = SslProtocols.Tls12;
             //add separate sockets/callbacks for other MarketEvent types, or determine message type from the ID (but some messages don't include IDs)
@@ -45,7 +41,7 @@ namespace Deribit
             ws.OnError += (sender, e) => { Log.Error(e.Message); };
             ws.Connect();
 
-            foreach (var ccy in currencies)
+            foreach (var ccy in this.currencies)
             {
                 //i'm not sure these are correct yet - need to spend more time exploring the API
                 ws.Send(GenerateMessage(
