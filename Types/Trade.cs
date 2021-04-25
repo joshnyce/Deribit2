@@ -3,7 +3,7 @@
 namespace Deribit.Types
 {
 
-    //using strings because data is serialized, but that might change when adding other destinations
+    //using strings because data is serialized, but that might change when adding other destinations (or if any numerical processing is required in this service)
 
     public class Trade : MarketEvent
     {
