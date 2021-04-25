@@ -10,8 +10,9 @@ namespace Deribit.Types
     public abstract class MarketEvent
     {
         private readonly string symbol;
-        private readonly static ConcurrentDictionary<Type, PropertyInfo[]> props = new();
         private readonly Type type;
+
+        private readonly static ConcurrentDictionary<Type, PropertyInfo[]> props = new();
 
         public MarketEvent(JToken msg)
         {
