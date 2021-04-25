@@ -7,6 +7,9 @@ namespace Deribit.Types
 
     public class Quote : MarketEvent
     {
+        [JsonProperty("instrument_name")]
+        public override string instrument_name { get; set; }
+
         [JsonProperty("best_bid_price")]
         public string best_bid_price { get; private set; }
 

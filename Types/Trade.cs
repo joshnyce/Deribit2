@@ -25,6 +25,9 @@ namespace Deribit.Types
         [JsonProperty("price")]
         public string price { get; private set; }
 
+        [JsonProperty("instrument_name")]
+        public override string instrument_name { get; set; }
+
         [JsonProperty("index_price")]
         public string index_price { get; private set; }
 
