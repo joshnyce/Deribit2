@@ -1,6 +1,7 @@
 ﻿using Deribit.Interfaces;
 using Deribit.Types;
 using Serilog;
+using System;
 
 namespace Deribit.Writers
 {
@@ -9,6 +10,11 @@ namespace Deribit.Writers
         public void ProcessMessage(MarketEvent Data)
         {
             Log.Information(Data.TextSerialize(false));
+        }
+
+        public void Dispose()
+        {
+            GC.SuppressFinalize(this);
         }
     }
 }

@@ -69,11 +69,12 @@ namespace Deribit
 
         public string[] GetInstruments(string Ccy, bool Expired, string Kind)
         {
+            //could use websocket for this too
             var parameters = new Dictionary<string, string>() {
                 ["currency"] = Ccy,
                 ["expired"] = Expired.ToString().ToLower(),
                 ["kind"] = Kind };
-            var client = new RestClient(urlGetInstruments); //could use websocket for this too
+            var client = new RestClient(urlGetInstruments); 
             var request = new RestRequest(Method.GET);
             request.AddHeader("Content-Type", "application/json");
             parameters.ForEach(x => request.AddParameter(x.Key, x.Value));

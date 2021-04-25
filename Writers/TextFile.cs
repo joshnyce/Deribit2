@@ -16,5 +16,10 @@ namespace Deribit.Writers
             using var writer = new StreamWriter(path, true);
             writer.WriteLine(Data.TextSerialize(new FileInfo(path).Length == 0));
         }
+
+        public void Dispose()
+        {
+            GC.SuppressFinalize(this);
+        }
     }
 }
