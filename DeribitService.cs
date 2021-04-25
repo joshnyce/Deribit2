@@ -15,7 +15,7 @@ using WebSocketSharp;
 
 namespace Deribit
 {
-    public class DeribitService : IDeribitService, IDisposable
+    public class DeribitService : IDeribitService
     {
         //these inputs should be configurable
         private const string urlGetInstruments = "https://test.deribit.com/api/v2/public/get_instruments";

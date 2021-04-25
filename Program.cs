@@ -29,7 +29,7 @@ namespace Deribit
                .CreateLogger();
             Writer writers = new Logger().ProcessMessage;
             writers += new TextFile().ProcessMessage; //multicast delegate supports multiple writers
-            //could create instances of IWriters dynamically using Activator.CreateInstance(), so the list of processors could be configured externally
+            //could create instances of IWriters dynamically using Activator.CreateInstance(), so the list of destinations/processors could be configured externally
             try
             {
                 var service = new DeribitService(currencies, paths, writers);                
