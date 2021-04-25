@@ -16,7 +16,7 @@ namespace Deribit.Types
 
         public MarketEvent(JToken msg)
         {
-            //would normally use bespoke classes to parse JSON, but this is faster for prototyping
+            //would normally use bespoke classes to parse JSON, but this is fine for prototyping and it's easy to change later
             type = GetType();
             if (!props.ContainsKey(type))
                 props[type] = type.GetProperties();
