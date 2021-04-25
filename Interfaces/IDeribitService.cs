@@ -5,7 +5,7 @@ using System;
 namespace Deribit.Interfaces
 {
 
-    //this can be used for dependency injection
+    //for dependency injection (to mock this service in other applications)
 
     public interface IDeribitService : IDisposable
     {
