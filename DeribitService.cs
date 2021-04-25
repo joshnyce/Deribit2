@@ -15,6 +15,9 @@ using WebSocketSharp;
 
 namespace Deribit
 {
+
+    //this could be a singleton, depending on use case
+
     public class DeribitService : IDeribitService
     {
         //these inputs should be configurable
