@@ -93,7 +93,7 @@ namespace Deribit
             paths.ForEach(p => obj
                 .SelectToken(p.outter)
                 ?.SelectToken(p.inner)
-                ?.OrderBy(x => (string)x["timestamp"])
+                ?.OrderBy(x => (string)x["timestamp"]) //this is a temporary hack until subscriptions have separate callbacks
                 .ThenBy(x => (string)x["trade_seq"])
                 .ForEach(x => ProcessMarketEvent<T>(x)));
         }
